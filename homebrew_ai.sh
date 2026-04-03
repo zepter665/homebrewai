@@ -1,4 +1,3 @@
-
 ### PREREQUIREMENTS ###
 
 # wget https://download.docker.com/linux/static/stable/x86_64/docker-29.3.1.tgz
@@ -15,8 +14,6 @@
 # wget https://github.com/Mirantis/cri-dockerd/releases/download/v0.4.2/cri-dockerd-0.4.2.amd64.tgz
 # sudo tar zxvf cri-dockerd-0.4.2.amd64.tgz
 
-
-
 # CNI_PLUGIN_VERSION="v1.9.1"
 # CNI_PLUGIN_TAR="cni-plugins-linux-amd64-$CNI_PLUGIN_VERSION.tgz" # change arch if not on amd64
 # CNI_PLUGIN_INSTALL_DIR="/opt/cni/bin"
@@ -26,18 +23,27 @@
 # sudo tar -xf "$CNI_PLUGIN_TAR" -C "$CNI_PLUGIN_INSTALL_DIR"
 # rm "$CNI_PLUGIN_TAR"
 
-
 # curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 
 # wget https://get.helm.sh/helm-v4.1.3-linux-amd64.tar.gz
 # sudo tar zxvf helm-v4.1.3-linux-amd64.tar.gz
 
-
 #######################################
 
-apt install docker.io -y
+# apt install docker.io -y
+sudo cp docker/* /usr/bin/
+sudo groupadd docker 2>&1
+sudo mkdir /etc/docker
 
-
+install containerd.service /etc/systemd/system
+install docker.service /etc/systemd/system
+install docker.socket /etc/systemd/system
+sudo systemctl daemon-reload
+sudo systemctl enable containerd
+sudo systemctl start containerd
+sudo systemctl enable docker.socket
+sudo systemctl enable docker.service
+sudo systemctl start docker
 
 sudo cp conntrack /usr/sbin/conntrack
 sudo chmod 755 /usr/sbin/conntrack
@@ -48,7 +54,6 @@ sudo chmod 755 /usr/local/bin/crictl
 sudo cp cni /opt/ -R
 sudo chmod 755 /opt/cni/bin/* -R
 
-
 install -o root -g root -m 0755 cri-dockerd /usr/local/bin/cri-dockerd
 install cri-docker.service /etc/systemd/system
 install cri-docker.socket /etc/systemd/system
@@ -58,24 +63,20 @@ systemctl enable --now cri-docker.socket
 
 service cri-docker start
 
-
 curl -LO https://github.com/kubernetes/minikube/releases/latest/download/minikube-linux-amd64
 sudo install minikube-linux-amd64 /usr/local/bin/minikube && rm minikube-linux-amd64
 
 minikube start --driver=none --cni calico
 sudo minikube config set driver none
 
-
 # kubectl
 install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
-
 # HELM
 install -o root -g root -m 0755 helm /usr/local/bin/helm
 
 # Kube-Config für externe Verwendung anpassen
 chmod +x ./embed_kubeconfig_certs.sh 
 ./embed_kubeconfig_certs.sh 
-
 ##################################################################
 ## KI installieren
 
@@ -88,7 +89,6 @@ helm install ollama otwld/ollama \
 --set ollama.models.pull={mistral} \
 --set ollama.models.run={mistral} \
 --set persistentVolume.enabled=false
-
 
 # OpenWebUI installieren (HELM)
 helm repo add open-webui "https://helm.openwebui.com/"
