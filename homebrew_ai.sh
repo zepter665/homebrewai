@@ -1,6 +1,10 @@
 
 ### PREREQUIREMENTS ###
 
+# wget https://download.docker.com/linux/static/stable/x86_64/docker-29.3.1.tgz
+# sudo tar zxvf docker-29.3.1.tgz
+# sudo rm -f docker-29.3.1.tgz
+
 # apt install conntrack -y
 
 # VERSION="v1.31.0" # check latest version in /releases page
@@ -32,6 +36,8 @@
 #######################################
 
 apt install docker.io -y
+
+
 
 sudo cp conntrack /usr/sbin/conntrack
 sudo chmod 755 /usr/sbin/conntrack
