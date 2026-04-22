@@ -1,6 +1,3 @@
-#######################################
-# apt install docker.io -y
-
 ## Docker Runtime Install
 wget https://download.docker.com/linux/static/stable/x86_64/docker-29.3.1.tgz
 tar zxvf docker-29.3.1.tgz
@@ -75,14 +72,11 @@ rm ./linux-amd64 -R
 
 ## Kube-Config für externe Verwendung anpassen
 chmod +x ./embed_kubeconfig_certs.sh 
-./embed_kubeconfig_certs.sh 
-
+./embed_kubeconfig_certs.sh
 ##################################################################
 ## KI installieren
-
 # Ollama installieren (HELM)
 helm repo add otwld "https://helm.otwld.com/"
-
 helm install ollama otwld/ollama \
 --set ollama.port="11434" \
 --set ollama.gpu.enabled=false \
@@ -92,7 +86,6 @@ helm install ollama otwld/ollama \
 
 # OpenWebUI installieren (HELM)
 helm repo add open-webui "https://helm.openwebui.com/"
-
 helm install open-webui open-webui/open-webui \
 --set ollama.enabled=false \
 --set ollamaUrls={http://ollama.default.svc.cluster.local:11434} \
