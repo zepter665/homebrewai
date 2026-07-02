@@ -57,8 +57,6 @@ curl -LO https://github.com/kubernetes/minikube/releases/latest/download/minikub
 sudo install minikube-linux-amd64 /usr/local/bin/minikube && rm minikube-linux-amd64
 minikube start --driver=none --cni calico
 sudo minikube config set driver none
-## Warte, bis Minikube vollständig gestartet ist
-sleep 60
 
 ## kubectl Install
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
