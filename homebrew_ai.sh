@@ -17,7 +17,7 @@ sudo systemctl enable docker.socket
 sudo systemctl enable docker.service
 sudo systemctl start docker
 
-## Conntrack Install
+## Conntrack Install > conntrack (Connection Tracking) ist ein Bestandteil des Linux-Kernels (Netfilter), der Netzwerkverbindungen verfolgt und ihren Zustand speichert
 sudo cp ./binaries/conntrack /usr/sbin/conntrack
 sudo chmod 755 /usr/sbin/conntrack
 
@@ -57,12 +57,13 @@ curl -LO https://github.com/kubernetes/minikube/releases/latest/download/minikub
 sudo install minikube-linux-amd64 /usr/local/bin/minikube && rm minikube-linux-amd64
 minikube start --driver=none --cni calico
 sudo minikube config set driver none
+## Warte, bis Minikube vollständig gestartet ist
+sleep 60
 
 ## kubectl Install
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 rm ./kubectl
-
 ## HELM  Install
 wget https://get.helm.sh/helm-v4.1.3-linux-amd64.tar.gz
 tar zxvf helm-v4.1.3-linux-amd64.tar.gz
@@ -70,9 +71,8 @@ sudo install -o root -g root -m 0755 ./linux-amd64/helm /usr/local/bin/helm
 rm ./helm-v4.1.3-linux-amd64.tar.gz
 rm ./linux-amd64 -R
 
-## Kube-Config für externe Verwendung anpassen
-chmod +x ./embed_kubeconfig_certs.sh 
-./embed_kubeconfig_certs.sh
+## Kube-Config für externe Verwendung anpassen  !!! ab hier den Verlauf in FreeLens zeigen
+chmod +x ./embed_kubeconfig_certs.sh && ./embed_kubeconfig_certs.sh
 ##################################################################
 ## KI installieren
 # Ollama installieren (HELM)
@@ -82,8 +82,9 @@ helm install ollama otwld/ollama \
 --set ollama.gpu.enabled=false \
 --set ollama.models.pull={mistral} \
 --set ollama.models.run={mistral} \
---set persistentVolume.enabled=false
-
+--set persistentVolume.enabled=false \
+--set service.type=NodePort \
+--set service.nodePort=30667
 # OpenWebUI installieren (HELM)
 helm repo add open-webui "https://helm.openwebui.com/"
 helm install open-webui open-webui/open-webui \
@@ -97,7 +98,8 @@ helm install open-webui open-webui/open-webui \
 --set persistence.enabled=false \
 --set pipelines.enabled=true \
 --set service.type=NodePort \
---set service.nodePort=30666
+--set service.nodePort=30666 \
+--version "14.8.0"
 
 
 
