@@ -71,7 +71,7 @@ chmod +x ./embed_kubeconfig_certs.sh && ./embed_kubeconfig_certs.sh
 
 ###### KI installieren ##################
 # LLM manuell kopieren, wegen Zeitersparnis
-mkdir -p /tmp/hostpath-provisioner/default && cp -R /tmp/pv-ollama /tmp/hostpath-provisioner/default/ollama
+mkdir -p /tmp/hostpath-provisioner/default && cp -R /ollama-tmp/ollama /tmp/hostpath-provisioner/default/
 # Ollama installieren (HELM)
 helm repo add otwld "https://helm.otwld.com/"
 helm install ollama otwld/ollama \
@@ -104,4 +104,13 @@ helm install open-webui open-webui/open-webui \
 
 ############################################################
 # Helper
+
+## Kube Config
 code /root/.kube/config 
+
+## Speicher und CPU Nutzung
+top
+
+## Ollama API
+http://192.168.0.xyz:30667
+
