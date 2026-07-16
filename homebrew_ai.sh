@@ -112,5 +112,5 @@ code /root/.kube/config
 top
 
 ## Ollama API
-http://192.168.0.xyz:30667
+http://172.28.87.125:30667
 
