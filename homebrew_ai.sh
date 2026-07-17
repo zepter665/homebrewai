@@ -109,8 +109,8 @@ helm install open-webui open-webui/open-webui \
 code /root/.kube/config 
 
 ## Speicher und CPU Nutzung
-top
+# top
 
 ## Ollama API
-http://172.28.87.125:30667
+# http://172.28.87.125:30667
 

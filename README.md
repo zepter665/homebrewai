@@ -23,6 +23,13 @@ Der Cluster nutzt Docker als Container-Runtime (über `cri-dockerd`) und Minikub
 
 Anschließend wird `embed_kubeconfig_certs.sh` ausgeführt, um die `~/.kube/config` für den externen Zugriff (z. B. mit [FreeLens](https://freelens.app/)) nutzbar zu machen.
 
+## Systemanforderungen
+
+- CPU: 4 Kerne, x86/x64
+- RAM: mindestens 8 GB
+- Speicherplatz: mindestens 30 GB HDD/SSD
+- Betriebssystem: aktuelles Linux (z. B. Ubuntu)
+
 ## Voraussetzungen
 
 - Linux, `x86_64` (Skripte enthalten fest verdrahtete `amd64`-Downloads)
