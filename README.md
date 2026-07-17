@@ -26,7 +26,7 @@ Anschließend wird `embed_kubeconfig_certs.sh` ausgeführt, um die `~/.kube/conf
 ## Systemanforderungen
 
 - CPU: 4 Kerne, x86/x64
-- RAM: mindestens 8 GB !!!
+- **RAM: mindestens 12 GB !!!**
 - Speicherplatz: mindestens 30 GB HDD/SSD
 - Betriebssystem: aktuelles Linux (z. B. Ubuntu)
 
@@ -52,7 +52,7 @@ chmod +x homebrew_ai.sh
 
 Nach der Installation sind u. a. erreichbar:
 - **Ollama API**: `http://<host-ip>:30667`
-- **Open WebUI**: NodePort `30666`
+- **Open WebUI**: `http://<host-ip>:30666`
 
 > **Hinweis:** Nach einem Neustart des Systems muss Minikube manuell wieder gestartet werden:
 > ```bash
