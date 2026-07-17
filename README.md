@@ -26,7 +26,7 @@ Anschließend wird `embed_kubeconfig_certs.sh` ausgeführt, um die `~/.kube/conf
 ## Systemanforderungen
 
 - CPU: 4 Kerne, x86/x64
-- RAM: mindestens 8 GB
+- RAM: mindestens 8 GB !!!
 - Speicherplatz: mindestens 30 GB HDD/SSD
 - Betriebssystem: aktuelles Linux (z. B. Ubuntu)
 
@@ -34,8 +34,7 @@ Anschließend wird `embed_kubeconfig_certs.sh` ausgeführt, um die `~/.kube/conf
 
 - Linux, `x86_64` (Skripte enthalten fest verdrahtete `amd64`-Downloads)
 - `sudo`-Rechte
-- Internetzugang (Downloads von Docker, GitHub Releases, Helm-Repos)
-- Für den KI-Teil: ein bereits lokal vorhandenes Modell unter `/ollama-tmp/ollama`, das nach `/tmp/hostpath-provisioner/default/` kopiert wird (siehe Hinweis unten)
+- Internetzugang (Downloads von Docker, GitHub Releases, Helm-Repos, sowie das LLM-Modell für Ollama)
 
 ## Verwendung
 
@@ -48,12 +47,17 @@ chmod +x homebrew_ai.sh
 
 > **Hinweis:** `homebrew_ai.sh` ist aktuell eher als Schritt-für-Schritt-Ablaufprotokoll aufgebaut (kein vollständig durchgetestetes, idempotentes Setup-Skript). Es empfiehlt sich, die Abschnitte einzeln oder zumindest mit Blick auf die Kommentare auszuführen, insbesondere:
 > - Versionsnummern (Docker, `crictl`, CNI-Plugins, `cri-dockerd`, Helm) ggf. vor dem Ausführen auf aktuelle Releases prüfen.
-> - Der Ollama-Modell-Kopiervorgang (`/ollama-tmp/ollama`) setzt voraus, dass dort bereits ein Modell abgelegt wurde, um den erneuten Download zu vermeiden.
+> - Ollama lädt beim Start das LLM `mistral` (ca. 4 GB) aus dem Internet herunter. Dadurch kann der Start von Ollama (bzw. bis der Pod `Ready` ist) einige Zeit dauern.
 > - Nach der Installation kann der Cluster-Zugriff über FreeLens oder `kubectl` mit der angepassten `~/.kube/config` erfolgen.
 
 Nach der Installation sind u. a. erreichbar:
 - **Ollama API**: `http://<host-ip>:30667`
 - **Open WebUI**: NodePort `30666`
+
+> **Hinweis:** Nach einem Neustart des Systems muss Minikube manuell wieder gestartet werden:
+> ```bash
+> minikube start
+> ```
 
 ### Deinstallation
 
