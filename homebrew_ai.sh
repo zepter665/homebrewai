@@ -115,8 +115,6 @@ helm install open-webui open-webui/open-webui \
 --version "14.8.0"
 
 
-
-
 ############################################################
 # Helper
 
