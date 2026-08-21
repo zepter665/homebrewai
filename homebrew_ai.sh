@@ -53,7 +53,8 @@ rm cri-dockerd-0.4.2.amd64.tgz
 ## MiniKube Install > Minikube ist ein Werkzeug, das einen lokalen Kubernetes-Cluster auf einem einzelnen Rechner erstellt und verwaltet, um Kubernetes für Entwicklung, Tests und Schulungen einfach nutzbar zu machen
 curl -LO https://github.com/kubernetes/minikube/releases/latest/download/minikube-linux-amd64
 sudo install minikube-linux-amd64 /usr/local/bin/minikube && rm minikube-linux-amd64
-sudo minikube start --driver=none --cni calico
+# --apiserver-ips fügt die öffentliche IP als SAN ins TLS-Zertifikat ein (externer Zugriff)
+sudo minikube start --driver=none --cni calico --apiserver-ips=20.218.132.124
 sudo minikube config set driver none
 
 ## kubectl Install > kubectl ist ein Kommandozeilenwerkzeug zur Verwaltung von Kubernetes-Clustern
@@ -84,6 +85,7 @@ rm ./helm-v4.1.3-linux-amd64.tar.gz
 rm ./linux-amd64 -R
 ## Kube-Config für externe Verwendung anpassen  !!! ab hier den Verlauf in FreeLens zeigen
 chmod +x ./embed_kubeconfig_certs.sh && ./embed_kubeconfig_certs.sh
+chmod +x ./customize_azure_ip.sh && ./customize_azure_ip.sh
 
 ###### KI installieren ##################
 # Ollama installieren (HELM)
