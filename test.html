@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Mystic Packs – Full Battle & Klatsche</title>
+<style>
+body {
+  background: #050510;
+  color: #fff;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+h1 {
+  margin-top: 20px;
+}
+.pack-btn {
+  padding: 10px 20px;
+  margin: 6px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg,#333,#555);
+  color: #fff;
+  cursor: pointer;
+}
+.pack-btn:hover {
+  filter: brightness(1.2);
+}
+#cards {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.card {
+  background: #151525;
+  border-radius: 10px;
+  border: 1px solid #444;
+  padding: 8px;
+  margin: 4px;
+  width: 110px;
+  height: 140px;
+  font-size: 0.8rem;
+  position: relative;
+  overflow: hidden;
+  transform: translateX(120px);
+  opacity: 0;
+  animation: slideReveal 0.4s ease-out forwards;
+}
+.card-name {
+  font-weight: 600;
+}
+.card-rarity {
+  margin-top: 4px;
+}
+
+/* Farben nach Seltenheit */
+.r-common { color:#b0bec5; }      /* grau */
+.r-rare { color:#4fc3f7; }        /* blau */
+.r-epic { color:#ab47bc; }        /* lila */
+.r-legendary {                    /* gold */
+  color:#ffeb3b;
+  text-shadow:0 0 6px rgba(255,235,59,0.9);
+}
+.r-mystic {                       /* regenbogen */
+  background: linear-gradient(135deg, #ff80ff, #80d0ff, #ffe066);
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 8px rgba(255,128,255,1);
+}
+
+/* Glow-Effekte */
+.card.common { box-shadow:0 0 6px rgba(176,190,197,0.4); }
+.card.rare { box-shadow:0 0 8px rgba(79,195,247,0.6); }
+.card.epic { box-shadow:0 0 10px rgba(171,71,188,0.8); }
+.card.legendary { box-shadow:0 0 14px rgba(255,235,59,0.9); }
+.card.mystic { box-shadow:0 0 18px rgba(255,128,255,1); }
+
+/* Mystische Regenbogen-Sterne */
+.mystic-stars {
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background-image:
+    radial-gradient(circle at 20% 20%,rgba(255,255,255,0.9) 0,transparent 40%),
+    radial-gradient(circle at 80% 30%,rgba(255,255,255,0.8) 0,transparent 40%),
+    radial-gradient(circle at 40% 80%,rgba(255,255,255,0.7) 0,transparent 40%);
+  animation: mysticBurst 1s ease-out forwards;
+  opacity:0;
+}
+
+@keyframes mysticBurst {
+  0% { opacity:0; transform:scale(0.8); }
+  40% { opacity:1; transform:scale(1.1); }
+  100% { opacity:0; transform:scale(1); }
+}
+
+/* Legendäre Gold-Drehung */
+.legendary-spin {
+  animation: legendarySpin 0.8s ease-out forwards;
+}
+
+@keyframes legendarySpin {
+  0% { transform:scale(0.8) rotate(-10deg); }
+  50% { transform:scale(1.1) rotate(10deg); }
+  100% { transform:scale(1) rotate(0deg); }
+}
+
+/* Pack-Reveal Slide */
+@keyframes slideReveal {
+  from { transform: translateX(120px); opacity:0; }
+  to { transform: translateX(0); opacity:1; }
+}
+
+.inventory {
+  background:#111;
+  padding:10px;
+  margin-top:20px;
+  border-radius:10px;
+  max-width:400px;
+  margin-left:auto;
+  margin-right:auto;
+  text-align:left;
+  font-size:0.85rem;
+}
+</style>
+</head>
+<body>
+
+<h1>Mystic Packs – Full Battle & Klatsche</h1>
+<p>Münzen: <span id="coins">300</span></p>
+
+<div>
+  <button class="pack-btn" onclick="openPack(5,3,'normal')">5 Karten (3 Münzen)</button>
+  <button class="pack-btn" onclick="openPack(10,5,'normal')">10 Karten (5 Münzen)</button>
+  <button class="pack-btn" onclick="openPack(15,12,'boost')">15 Karten (12 Münzen / Boost)</button>
+  <button class="pack-btn" onclick="openPack(20,20,'normal')">20 Karten (20 Münzen)</button>
+  <button class="pack-btn" onclick="openPack(50,100,'mega')">50 Karten (100 Münzen / 5 Legendäre garantiert)</button>
+  <button class="pack-btn" onclick="openPack(200,300,'ultra')">200 Karten (300 Münzen / 10 Legendäre + 1 Mystische garantiert)</button>
+</div>
+
+<div>
+  <button class="pack-btn" onclick="pickBattleTeam()">Kampfmodus starten</button>
+  <button class="pack-btn" onclick="klatscheModus()">Klatsche-Modus</button>
+</div>
+
+<h2>Gezogene Karten:</h2>
+<div id="cards"></div>
+
+<h2>Inventar:</h2>
+<div id="inventory" class="inventory"></div>
+
+<script>
+let coins = 300;
+let inventory = {};
+
+const animals = [
+  // gewöhnlich
+  {name:"Zuckerhamster", rarity:"common"},
+  {name:"Mini-Eule", rarity:"common"},
+  {name:"Waldhirsch", rarity:"common"},
+  {name:"Mondhase", rarity:"common"},
+  {name:"Sandmaus", rarity:"common"},
+  {name:"Pfützenfrosch", rarity:"common"},
+  {name:"Kieselkrabbe", rarity:"common"},
+  {name:"Wolkenvogel", rarity:"common"},
+  {name:"Knusper-Igel", rarity:"common"},
+  // selten
+  {name:"Kristallkatze", rarity:"rare"},
+  {name:"Wassergeist", rarity:"rare"},
+  {name:"Steingolem", rarity:"rare"},
+  {name:"Schneekatze", rarity:"rare"},
+  {name:"Moosbär", rarity:"rare"},
+  {name:"Windfuchs", rarity:"rare"},
+  // episch
+  {name:"Feuerfuchs", rarity:"epic"},
+  {name:"Schattenwolf", rarity:"epic"},
+  {name:"Blitzgreif", rarity:"epic"},
+  {name:"Keksbär", rarity:"epic"},
+  {name:"Donnerkatze", rarity:"epic"},
+  {name:"Frostwolf", rarity:"epic"},
+  // legendär
+  {name:"Feuerdrache", rarity:"legendary"},
+  {name:"Himmelsphoenix", rarity:"legendary"},
+  {name:"Rubin-Fuchs", rarity:"legendary"},
+  {name:"Sturmdrache", rarity:"legendary"},
+  {name:"Eisgigant", rarity:"legendary"},
+  {name:"Sonnenlöwe", rarity:"legendary"},
+  // mystisch
+  {name:"Astral-Tiger", rarity:"mystic"},
+  {name:"Nebel-Phoenix", rarity:"mystic"},
+  {name:"Runen-Wolf", rarity:"mystic"},
+  {name:"Sternen-Drache", rarity:"mystic"},
+  {name:"Traum-Fuchs", rarity:"mystic"}
+];
+
+function getRandomRarity(mode) {
+  let roll = Math.random() * 100;
+
+  if (mode === "boost") {
+    if (roll < 50) return "common";
+    if (roll < 75) return "rare";
+    if (roll < 90) return "epic";
+    if (roll < 98) return "legendary";
+    return "mystic";
+  }
+
+  if (mode === "ultra") {
+    if (roll < 40) return "common";
+    if (roll < 65) return "rare";
+    if (roll < 85) return "epic";
+    if (roll < 95) return "legendary";
+    return "mystic";
+  }
+
+  if (mode === "mega") {
+    if (roll < 50) return "common";
+    if (roll < 75) return "rare";
+    if (roll < 90) return "epic";
+    if (roll < 97) return "legendary";
+    return "mystic";
+  }
+
+  if (roll < 60) return "common";
+  if (roll < 85) return "rare";
+  if (roll < 95) return "epic";
+  if (roll < 99) return "legendary";
+  return "mystic";
+}
+
+function updateInventory(name) {
+  if (!inventory[name]) inventory[name] = 0;
+  inventory[name]++;
+}
+
+function renderInventory() {
+  const inv = document.getElementById("inventory");
+  inv.innerHTML = "";
+  const keys = Object.keys(inventory).sort();
+  keys.forEach(k => {
+    const div = document.createElement("div");
+    div.textContent = k + " x" + inventory[k];
+    inv.appendChild(div);
+  });
+}
+
+function drawCardByRarity(rarity) {
+  const pool = animals.filter(a => a.rarity === rarity);
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+
+function openPack(amount, cost, mode) {
+  if (coins < cost) {
+    alert("Nicht genug Münzen!");
+    return;
+  }
+  coins -= cost;
+  document.getElementById("coins").textContent = coins;
+
+  const container = document.getElementById("cards");
+  container.innerHTML = "";
+
+  let guaranteedLegendary = 0;
+  let guaranteedMystic = 0;
+
+  if (mode === "mega") guaranteedLegendary = 5;
+  if (mode === "ultra") {
+    guaranteedLegendary = 10;
+    guaranteedMystic = 1;
+  }
+
+  const pulled = [];
+
+  for (let i = 0; i < guaranteedLegendary; i++) {
+    pulled.push(drawCardByRarity("legendary"));
+  }
+  for (let i = 0; i < guaranteedMystic; i++) {
+    pulled.push(drawCardByRarity("mystic"));
+  }
+
+  while (pulled.length < amount) {
+    const rarity = getRandomRarity(mode);
+    pulled.push(drawCardByRarity(rarity));
+  }
+
+  pulled.forEach((card, index) => {
+    updateInventory(card.name);
+
+    const div = document.createElement("div");
+    div.className = "card " + card.rarity;
+
+    const nameEl = document.createElement("div");
+    nameEl.className = "card-name";
+    nameEl.textContent = card.name;
+
+    const rarityEl = document.createElement("div");
+    rarityEl.className = "card-rarity r-" + card.rarity;
+    rarityEl.textContent =
+      card.rarity === "common" ? "Gewöhnlich" :
+      card.rarity === "rare" ? "Selten" :
+      card.rarity === "epic" ? "Episch" :
+      card.rarity === "legendary" ? "Legendär" :
+      "Mystisch";
+
+    div.appendChild(nameEl);
+    div.appendChild(rarityEl);
+
+    if (card.rarity === "legendary") {
+      div.classList.add("legendary-spin");
+    }
+    if (card.rarity === "mystic") {
+      const stars = document.createElement("div");
+      stars.className = "mystic-stars";
+      div.appendChild(stars);
+    }
+
+    div.style.animationDelay = (index * 0.05) + "s";
+
+    container.appendChild(div);
+  });
+
+  renderInventory();
+}
+
+/* ============================
+   KAMPFMODUS – Pokémon Style
+   ============================ */
+
+let battleTeam = [];
+let enemyTeam = [];
+
+function pickBattleTeam() {
+  const keys = Object.keys(inventory);
+  if (keys.length < 3) {
+    alert("Du brauchst mindestens 3 Karten für einen Kampf!");
+    return;
+  }
+
+  battleTeam = keys.slice(0,3).map(name => {
+    const card = animals.find(a => a.name === name);
+    return {
+      name: card.name,
+      rarity: card.rarity,
+      hp: card.rarity === "common" ? 40 :
+          card.rarity === "rare" ? 60 :
+          card.rarity === "epic" ? 80 :
+          card.rarity === "legendary" ? 120 : 150,
+      atk: card.rarity === "common" ? 8 :
+           card.rarity === "rare" ? 12 :
+           card.rarity === "epic" ? 18 :
+           card.rarity === "legendary" ? 30 : 40
+    };
+  });
+
+  enemyTeam = [];
+  for (let i = 0; i < 3; i++) {
+    const r = getRandomRarity("normal");
+    const c = drawCardByRarity(r);
+    enemyTeam.push({
+      name: c.name,
+      rarity: c.rarity,
+      hp: c.rarity === "common" ? 40 :
+          c.rarity === "rare" ? 60 :
+          c.rarity === "epic" ? 80 :
+          c.rarity === "legendary" ? 120 : 150,
+      atk: c.rarity === "common" ? 8 :
+           c.rarity === "rare" ? 12 :
+           c.rarity === "epic" ? 18 :
+           c.rarity === "legendary" ? 30 : 40
+    });
+  }
+
+  alert("Kampf gestartet!");
+  startBattle();
+}
+
+function startBattle() {
+  let i = 0;
+  let j = 0;
+
+  while (i < 3 && j < 3) {
+    enemyTeam[j].hp -= battleTeam[i].atk;
+    if (enemyTeam[j].hp <= 0) {
+      j++;
+      coins += 5;
+      continue;
+    }
+
+    battleTeam[i].hp -= enemyTeam[j].atk;
+    if (battleTeam[i].hp <= 0) {
+      i++;
+      continue;
+    }
+  }
+
+  if (i < 3) {
+    alert("Du hast gewonnen!");
+    coins += 10;
+  } else {
+    alert("Du hast verloren!");
+  }
+
+  document.getElementById("coins").textContent = coins;
+}
+
+/* ============================
+   KLATSCHE-MODUS – FIFA Style
+   ============================ */
+
+function klatscheModus() {
+  const keys = Object.keys(inventory);
+  if (keys.length === 0) {
+    alert("Du hast noch keine Karten!");
+    return;
+  }
+
+  const myCardName = keys[Math.floor(Math.random()*keys.length)];
+  const myCard = animals.find(a => a.name === myCardName);
+
+  const enemyRarity = getRandomRarity("normal");
+  const enemyCard = drawCardByRarity(enemyRarity);
+
+  const rarityPower = {
+    common: 1,
+    rare: 2,
+    epic: 3,
+    legendary: 4,
+    mystic: 5
+  };
+
+  const myPower = rarityPower[myCard.rarity];
+  const enemyPower = rarityPower[enemyCard.rarity];
+
+  if (myPower > enemyPower) {
+    alert("Du hast geklatscht! +3 Münzen");
+    coins += 3;
+  } else if (myPower < enemyPower) {
+    alert("Die KI hat dich geklatscht!");
+  } else {
+    alert("Gleichstand!");
+  }
+
+  document.getElementById("coins").textContent = coins;
+}
+</script>
+
+</body>
+</html>
