@@ -54,28 +54,14 @@ rm cri-dockerd-0.4.2.amd64.tgz
 curl -LO https://github.com/kubernetes/minikube/releases/latest/download/minikube-linux-amd64
 sudo install minikube-linux-amd64 /usr/local/bin/minikube && rm minikube-linux-amd64
 # --apiserver-ips fügt die öffentliche IP als SAN ins TLS-Zertifikat ein (externer Zugriff)
-sudo minikube start --driver=none --cni calico --apiserver-ips=20.218.132.124
+# --container-runtime=docker sorgt dafür, dass minikube cri-dockerd (statt containerd) als CRI nutzt
+sudo minikube start --driver=none --container-runtime=docker --cni calico --apiserver-ips=20.218.132.124
 sudo minikube config set driver none
 
 ## kubectl Install > kubectl ist ein Kommandozeilenwerkzeug zur Verwaltung von Kubernetes-Clustern
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 rm ./kubectl
-
-## Warten, bis das Calico-Netzwerk bereit ist > verhindert Race-Conditions wie "error creating calico client: host must be a URL or a host:port pair"
-CALICO_TIMEOUT=180
-echo "Warte auf Node-Ready-Status (Timeout: ${CALICO_TIMEOUT}s)..."
-if ! kubectl wait --for=condition=Ready node --all --timeout="${CALICO_TIMEOUT}s"; then
-    echo "FEHLER: Node ist nach ${CALICO_TIMEOUT}s nicht Ready. Bitte 'kubectl describe node' und 'kubectl -n kube-system get pods' prüfen." >&2
-    exit 1
-fi
-
-echo "Warte auf Calico-Pods in kube-system (Timeout: ${CALICO_TIMEOUT}s)..."
-if ! kubectl -n kube-system wait --for=condition=Ready pod -l k8s-app=calico-node --timeout="${CALICO_TIMEOUT}s"; then
-    echo "FEHLER: Calico-Pods sind nach ${CALICO_TIMEOUT}s nicht Ready. Bitte 'kubectl -n kube-system get pods -l k8s-app=calico-node' und 'kubectl -n kube-system logs -l k8s-app=calico-node' prüfen." >&2
-    exit 1
-fi
-echo "Calico-Netzwerk ist bereit."
 
 ## HELM  Install > HELM ist ein Paketmanager für Kubernetes, der die Verwaltung von Kubernetes-Anwendungen vereinfacht
 wget https://get.helm.sh/helm-v4.1.3-linux-amd64.tar.gz
