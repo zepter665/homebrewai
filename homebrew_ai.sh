@@ -71,7 +71,7 @@ rm ./helm-v4.1.3-linux-amd64.tar.gz
 rm ./linux-amd64 -R
 ## Kube-Config für externe Verwendung anpassen  !!! ab hier den Verlauf in FreeLens zeigen
 chmod +x ./embed_kubeconfig_certs.sh && ./embed_kubeconfig_certs.sh
-chmod +x ./customize_azure_ip.sh && ./customize_azure_ip.sh
+# chmod +x ./customize_azure_ip.sh && ./customize_azure_ip.sh # nur nötig, wenn man eine VM benutzt, die eine NAT-IP-Adresse benutzt (z.B. Azure VM)
 
 ###### KI installieren ##################
 # Ollama installieren (HELM)
@@ -110,6 +110,8 @@ code "$HOME/.kube/config"
 ## Speicher und CPU Nutzung
 # top
 
-## Ollama API
-# http://172.28.87.125:30667
+## OpenWeb UI - Oberfläche
+# http://<ip-adresse-der-linux-maschine>:30666
 
+## Ollama API
+# http://<ip-adresse-der-linux-maschine>:30667
